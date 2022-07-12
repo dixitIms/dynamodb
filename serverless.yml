@@ -1,0 +1,78 @@
+
+service: my-serverless-project
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  stage: dev
+  runtime: python3.8
+  region: us-east-1
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:*
+      - lambda:*
+    Resource: "*"
+
+
+
+functions:
+  put_cities_data:
+    handler: createuser.putItems
+    events:
+      - http:
+          path: data/putitem
+          method: put
+          cors: true
+
+  get_cities_data:
+    handler: createuser.getItems
+    events:
+      - http:
+          path: data/getitem
+          method: get
+          cors: true
+          
+  get_all_cities_data:
+    handler: createuser.getAllCities
+    events:
+      - http:
+          path: data/getall
+          method: get
+          cors: true
+
+  get_update_cities_data:
+    handler: createuser.updateCity
+    events:
+      - http:
+          path: data/update
+          method: post
+          cors: true
+
+  get_delete_cities_data:
+    handler: createuser.deleteCity
+    events:
+      - http:
+          path: data/delete
+          method: delete
+          cors: true
+
+Resources:
+    AccountsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: citiesData
+          AttributeDefinitions:
+            - AttributeName: id
+              AttributeType: S
+            - AttributeName: name
+              AttributeType: S
+          KeySchema:
+            - AttributeName: id
+              KeyType: HASH
+            # - AttributeName: name
+            #   KeyType: RANGE
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
